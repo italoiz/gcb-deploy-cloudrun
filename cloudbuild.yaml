@@ -75,10 +75,10 @@ steps:
           SERVICE_NAME="$$SERVICE_NAME-stg"
         fi;
 
-        gcloud beta run deploy $$SERVICE_NAME \
-          --image $$IMAGE_NAME:$$TAG \
+        gcloud beta run deploy "$$SERVICE_NAME" \
+          --image "$$IMAGE_NAME:$$TAG" \
           --platform managed \
-          --region $$SERVICE_REGION \
+          --region "$$SERVICE_REGION" \
           --quiet
 
 images:
