@@ -75,6 +75,10 @@ steps:
           SERVICE_NAME="$$SERVICE_NAME-stg"
         fi;
 
+        echo "Deploy image: $$IMAGE_NAME:$$TAG"
+        echo "Service name: $$SERVICE_NAME"
+        echo "Service region: $$SERVICE_REGION"
+
         gcloud beta run deploy "$$SERVICE_NAME" \
           --image "$$IMAGE_NAME:$$TAG" \
           --platform managed \
