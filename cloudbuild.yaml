@@ -2,7 +2,7 @@ steps:
   - id: "Build Image"
     name: "gcr.io/cloud-builders/docker"
     args:
-      ["build", "-t", "gcr.io/$PROJECT_ID/gcb-deploy-cloudrun:$COMMIT_SHA", "."]
+      ["build", "-t", "gcr.io/$PROJECT_ID/${_CR_SERVICE_NAME}:$COMMIT_SHA", "."]
 
   - id: "Tagging Image"
     name: "gcr.io/cloud-builders/docker"
@@ -10,7 +10,7 @@ steps:
     args:
       - "-c"
       - |
-        IMAGE_NAME="gcr.io/$PROJECT_ID/gcb-deploy-cloudrun"
+        IMAGE_NAME="gcr.io/$PROJECT_ID/${_CR_SERVICE_NAME}"
         UNTAGGED_IMAGE="$$IMAGE_NAME:$COMMIT_SHA"
 
         if [[ "$BRANCH_NAME" == "develop" ]]; then
@@ -91,4 +91,4 @@ steps:
           --quiet
 
 images:
-  - gcr.io/$PROJECT_ID/gcb-deploy-cloudrun
+  - gcr.io/$PROJECT_ID/${_CR_SERVICE_NAME}
