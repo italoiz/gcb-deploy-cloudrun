@@ -83,6 +83,7 @@ steps:
           --image "$$IMAGE_NAME:$$TAG" \
           --platform managed \
           --region "$$SERVICE_REGION" \
+          --allow-unauthenticated \
           --quiet
 
 images:
