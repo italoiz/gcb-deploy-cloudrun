@@ -10,19 +10,19 @@ steps:
     args:
       - "-c"
       - |
-        IMAGE_NAME="gcr.io/$PROJECT_ID/gcp-deploy-cloudrun"
+        IMAGE_NAME="gcr.io/$PROJECT_ID/gcb-deploy-cloudrun"
         UNTAGGED_IMAGE="$$IMAGE_NAME:$COMMIT_SHA"
 
         if [[ "$BRANCH_NAME" == "develop" ]]; then
           echo "Create tag for \"staging\""
-          docker tag $$UNTAGGED_IMAGE  $$IMAGE_NAME:staging
+          docker tag $$UNTAGGED_IMAGE $$IMAGE_NAME:staging
           echo "staging" > TAG
         fi;
 
         if [[ "$TAG_NAME" ]]; then
           echo "Create tag for \"$TAG_NAME\""
-          docker tag $$UNTAGGED_IMAGE  $$IMAGE_NAME:latest
-          docker tag $$UNTAGGED_IMAGE  $$IMAGE_NAME:$TAG_NAME
+          docker tag $$UNTAGGED_IMAGE $$IMAGE_NAME:latest
+          docker tag $$UNTAGGED_IMAGE $$IMAGE_NAME:$TAG_NAME
           echo "$TAG_NAME" > TAG
         fi;
 
@@ -79,4 +79,4 @@ steps:
           --quiet
 
 images:
-  - gcr.io/$PROJECT_ID/gcp-deploy-cloudrun
+  - gcr.io/$PROJECT_ID/gcb-deploy-cloudrun
