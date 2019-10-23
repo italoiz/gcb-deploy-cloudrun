@@ -38,7 +38,11 @@ steps:
       - |
         TAG="$$(cat TAG)"
         IMAGE_NAME="$$(cat IMAGE_NAME)"
+        UNTAGGED_IMAGE="$$IMAGE_NAME:$COMMIT_SHA"
         PUSHED=0
+
+        echo "Removing tag from $$UNTAGGED_IMAGE"
+        docker rmi $$UNTAGGED_IMAGE
 
         echo "Image name: $$IMAGE_NAME"
         echo "Tag name: $$TAG"
