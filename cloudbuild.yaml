@@ -40,6 +40,9 @@ steps:
         IMAGE_NAME="$$(cat IMAGE_NAME)"
         PUSHED=0
 
+        echo "Image name: $$IMAGE_NAME"
+        echo "Tag name: $$TAG"
+
         if [[ $(docker images -q "$$IMAGE_NAME:latest") ]]; then
           echo "Push \"$$IMAGE_NAME:latest\" to Registry"
           docker push $$IMAGE_NAME:latest
