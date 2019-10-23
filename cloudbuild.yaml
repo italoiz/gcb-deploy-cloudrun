@@ -49,7 +49,7 @@ steps:
           PUSHED=$$PUSHED+1
         fi;
 
-        if [[ $(docker imaages -q "$$IMAGE_NAME:$$TAG") ]]; then
+        if [[ $(docker images -q "$$IMAGE_NAME:$$TAG") ]]; then
           echo "Push \"$$IMAGE_NAME:$$TAG\" to Registry"
           docker push $$IMAGE_NAME:$$TAG
           PUSHED=$$PUSHED+1
