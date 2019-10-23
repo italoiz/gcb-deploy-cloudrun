@@ -1,0 +1,82 @@
+steps:
+  - id: "Build Image"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      ["build", "-t", "gcr.io/$PROJECT_ID/gcb-deploy-cloudrun:$COMMIT_SHA", "."]
+
+  - id: "Tagging Image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        IMAGE_NAME="gcr.io/$PROJECT_ID/gcp-deploy-cloudrun"
+        UNTAGGED_IMAGE="$$IMAGE_NAME:$COMMIT_SHA"
+
+        if [[ "$BRANCH_NAME" == "develop" ]]; then
+          echo "Create tag for \"staging\""
+          docker tag $$UNTAGGED_IMAGE  $$IMAGE_NAME:staging
+          echo "staging" > TAG
+        fi;
+
+        if [[ "$TAG_NAME" ]]; then
+          echo "Create tag for \"$TAG_NAME\""
+          docker tag $$UNTAGGED_IMAGE  $$IMAGE_NAME:latest
+          docker tag $$UNTAGGED_IMAGE  $$IMAGE_NAME:$TAG_NAME
+          echo "$TAG_NAME" > TAG
+        fi;
+
+        echo "$$IMAGE_NAME" > IMAGE_NAME
+
+        echo "Tag created: $$(cat TAG)"
+
+  - id: "Push to Container Registry"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        TAG="$$(cat TAG)"
+        IMAGE_NAME="$$(cat IMAGE_NAME)"
+        PUSHED=0
+
+        if [[ $(docker images -q "$$IMAGE_NAME:latest") ]]; then
+          echo "Push \"$$IMAGE_NAME:latest\" to Registry"
+          docker push $$IMAGE_NAME:latest
+          PUSHED=$$PUSHED+1
+        fi;
+
+        if [[ $(docker imaages -q "$$IMAGE_NAME:$$TAG") ]]; then
+          echo "Push \"$$IMAGE_NAME:$$TAG\" to Registry"
+          docker push $$IMAGE_NAME:$$TAG
+          PUSHED=$$PUSHED+1
+        fi;
+
+        if [[ $$PUSHED == 0 ]]; then
+          echo "No images have been uploaded to Container Registry"
+          exit 1
+        fi;
+
+  - id: "Deploy to Cloud Run"
+    name: "gcr.ios/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        TAG="$$(cat TAG)"
+        IMAGE_NAME="$$(cat IMAGE_NAME)"
+        SERVICE_NAME="${_CR_SERVICE_NAME}"
+        SERVICE_REGION="${_CR_SERVICE_REGION}"
+
+        if [[ "$BRANCH_NAME" == "develop" ]]; then
+          SERVICE_NAME="$$SERVICE_NAME-stg"
+        fi;
+
+        gcloud beta run deploy $$SERVICE_NAME \
+          --image $$IMAGE_NAME:$$TAG \
+          --platform managed \
+          --region $$SERVICE_REGION \
+          --quiet
+
+images:
+  - gcr.io/$PROJECT_ID/gcp-deploy-cloudrun
