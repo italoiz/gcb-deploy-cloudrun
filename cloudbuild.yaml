@@ -61,7 +61,7 @@ steps:
         fi;
 
   - id: "Deploy to Cloud Run"
-    name: "gcr.ios/cloud-builders/gcloud"
+    name: "gcr.io/cloud-builders/gcloud"
     entrypoint: "bash"
     args:
       - "-c"
